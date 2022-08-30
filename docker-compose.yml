@@ -6,8 +6,10 @@ x-web-defaults: &web-defaults
     context: backend
     dockerfile: "Dockerfile${DOCKERFILE_VERSION-}"
   volumes:
-    - ./backend:/app
-    - ./frontend:/frontend
+    - obico-server-app:/app
+    - obico-server-frontend:/frontend
+  networks:
+    - obico-server
   depends_on:
     - redis
   environment:
@@ -51,7 +53,9 @@ services:
         #ML_API_TOKEN:
         #HAS_GPU: 'False'
     command: bash -c "gunicorn --bind 0.0.0.0:3333 --workers 1 wsgi"
-
+    networks:
+      - obico-server
+      
   web:
     <<: *web-defaults
     hostname: web
@@ -69,3 +73,5 @@ services:
   redis:
     restart: unless-stopped
     image: redis:5.0-alpine
+    networks:
+      - obico-server
